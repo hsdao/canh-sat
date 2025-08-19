@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeMap Việt Nam - Mạng lưới cảnh báo cộng đồng thông minh</title>
+    <meta name="description" content="Nền tảng cảnh báo cộng đồng với AI, bản đồ thời gian thực và hệ thống xác minh đa tầng. Cùng xây dựng Việt Nam an toàn hơn.">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        vietnam: {
+                            red: '#da020e',
+                            yellow: '#ffcd00'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        .animate-slide-up { animation: slideUp 0.8s ease-out forwards; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #da020e 0%, #ffcd00 50%, #22c55e 100%);
+        }
+        
+        .vietnam-pattern {
+            background-image: 
+                radial-gradient(circle at 25% 25%, #da020e 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, #ffcd00 2px, transparent 2px);
+            background-size: 50px 50px;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+
+        .emergency-pulse {
+            animation: emergencyPulse 2s infinite;
+        }
+
+        @keyframes emergencyPulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% { 
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+        }
+
+        .trust-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #92400e;
+        }
+
+        .ai-verified {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md z-50 border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">🛡️</span>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold">SafeMap VN</span>
+                        <div class="text-xs text-gray-500">AI-Powered Community</div>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <button onclick="showPage('home')" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-600 transition-colors">Trang chủ</button>
+                    <button onclick="showPage('features')" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-600 transition-colors">Tính năng</button>
+                    <button onclick="showPage('community')" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-600 transition-colors">Cộng đồng</button>
+                    <button onclick="showPage('map')" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-600 transition-colors">Bản đồ</button>
+                    <button onclick="showPage('about')" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-600 transition-colors">Về chúng tôi</button>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:flex items-center space-x-2 bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-full">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm text-green-700 dark:text-green-400 font-medium">24/7 Active</span>
+                    </div>
+                    <button id="darkModeToggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </button>
+                    <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        Tải Ứng Dụng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="home" class="page active">
+        <!-- Hero Section -->
+        <section class="pt-24 pb-16 bg-gradient-to-br from-red-50 via-yellow-50 to-green-50 dark:from-gray-800 dark:to-gray-900 vietnam-pattern">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="animate-fade-in">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <span class="text-2xl">🇻🇳</span>
+                            <span class="text-sm font-medium text-vietnam-red">Công nghệ AI cho cộng đồng</span>
+                        </div>
+                        <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">
+                            Mạng lưới cảnh báo
+                            <span class="gradient-bg bg-clip-text text-transparent">thông minh</span>
+                        </h1>
+                        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+                            Nền tảng cảnh báo cộng đồng đầu tiên tại Việt Nam tích hợp AI, xác minh đa tầng và bản đồ thời gian thực. 
+                            Cùng nhau xây dựng một Việt Nam an toàn hơn.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                            <button class="gradient-bg text-white px-8 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition-opacity flex items-center justify-center space-x-2">
+                                <span>🚀</span>
+                                <span>Tham gia ngay</span>
+                            </button>
+                            <button onclick="showPage('features')" class="border-2 border-vietnam-red text-vietnam-red px-8 py-4 rounded-xl font-semibold text-lg hover:bg-red-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2">
+                                <span>🤖</span>
+                                <span>Khám phá AI</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Live Stats -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-primary-600" id="activeUsers">2,847</div>
+                                <div class="text-sm text-gray-500">Người dùng online</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-warning-600" id="todayAlerts">156</div>
+                                <div class="text-sm text-gray-500">Cảnh báo hôm nay</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-danger-600" id="aiVerified">98.7%</div>
+                                <div class="text-sm text-gray-500">Độ chính xác AI</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="animate-slide-up">
+                        <div class="relative">
+                            <!-- Main App Preview -->
+                            <div class="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-3xl flex items-center justify-center animate-float shadow-2xl">
+                                <div class="text-center p-8">
+                                    <div class="text-6xl mb-4">📱</div>
+                                    <div class="text-2xl font-bold text-gray-800 dark:text-white mb-2">SafeMap VN</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-300 mb-4">AI-Powered Safety Network</div>
+                                    <div class="flex justify-center space-x-2">
+                                        <div class="w-3 h-3 bg-danger-500 rounded-full animate-pulse"></div>
+                                        <div class="w-3 h-3 bg-warning-500 rounded-full animate-pulse" style="animation-delay: 0.5s"></div>
+                                        <div class="w-3 h-3 bg-primary-500 rounded-full animate-pulse" style="animation-delay: 1s"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Floating Elements -->
+                            <div class="absolute -top-4 -right-4 w-16 h-16 bg-danger-500 rounded-full flex items-center justify-center text-white font-bold emergency-pulse">
+                                🚨
+                            </div>
+                            <div class="absolute -bottom-4 -left-4 w-16 h-16 ai-verified rounded-full flex items-center justify-center text-white font-bold animate-pulse">
+                                🤖
+                            </div>
+                            <div class="absolute top-1/2 -left-8 w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center text-white animate-bounce">
+                                ✅
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency Categories -->
+        <section class="py-20 bg-white dark:bg-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 animate-fade-in">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Các Loại Cảnh Báo Cộng Đồng</h2>
+                    <p class="text-xl text-gray-600 dark:text-gray-300">Hệ thống phân loại thông minh với 3 mức độ ưu tiên</p>
+                </div>
+                
+                <!-- Priority Levels -->
+                <div class="grid md:grid-cols-3 gap-8 mb-16">
+                    <div class="bg-danger-50 dark:bg-danger-900/20 p-6 rounded-2xl border-2 border-danger-200 dark:border-danger-800">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🔴</div>
+                            <h3 class="text-xl font-bold text-danger-700 dark:text-danger-400 mb-2">KHẨN CẤP</h3>
+                            <p class="text-danger-600 dark:text-danger-300 text-sm">Nguy hiểm trực tiếp, cần hành động ngay</p>
+                        </div>
+                    </div>
+                    <div class="bg-warning-50 dark:bg-warning-900/20 p-6 rounded-2xl border-2 border-warning-200 dark:border-warning-800">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🟠</div>
+                            <h3 class="text-xl font-bold text-warning-700 dark:text-warning-400 mb-2">CẢNH BÁO</h3>
+                            <p class="text-warning-600 dark:text-warning-300 text-sm">Cần chú ý và đề phòng</p>
+                        </div>
+                    </div>
+                    <div class="bg-primary-50 dark:bg-primary-900/20 p-6 rounded-2xl border-2 border-primary-200 dark:border-primary-800">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🟢</div>
+                            <h3 class="text-xl font-bold text-primary-700 dark:text-primary-400 mb-2">THÔNG TIN</h3>
+                            <p class="text-primary-600 dark:text-primary-300 text-sm">Thông tin tham khảo hữu ích</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Categories -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg card-hover border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-4 text-center">🔓</div>
+                        <h3 class="text-lg font-semibold mb-2 text-center">Trộm cắp & Cướp giật</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm text-center">Cảnh báo tội phạm, khu vực nguy hiểm</p>
+                        <div class="mt-4 flex justify-center">
+                            <span class="bg-danger-100 text-danger-700 px-2 py-1 rounded-full text-xs">Ưu tiên cao</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg card-hover border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-4 text-center">🚗</div>
+                        <h3 class="text-lg font-semibold mb-2 text-center">Tai nạn & Giao thông</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm text-center">Tai nạn, kẹt xe, đường hỏng</p>
+                        <div class="mt-4 flex justify-center">
+                            <span class="bg-warning-100 text-warning-700 px-2 py-1 rounded-full text-xs">Ưu tiên trung</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg card-hover border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-4 text-center">🔥</div>
+                        <h3 class="text-lg font-semibold mb-2 text-center">Cháy nổ & Khẩn cấp</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm text-center">Hỏa hoạn, nổ gas, sự cố nghiêm trọng</p>
+                        <div class="mt-4 flex justify-center">
+                            <span class="bg-danger-100 text-danger-700 px-2 py-1 rounded-full text-xs">Khẩn cấp</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg card-hover border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-4 text-center">🌊</div>
+                        <h3 class="text-lg font-semibold mb-2 text-center">Thiên tai & Môi trường</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm text-center">Ngập lụt, sạt lở, bão lũ</p>
+                        <div class="mt-4 flex justify-center">
+                            <span class="bg-warning-100 text-warning-700 px-2 py-1 rounded-full text-xs">Theo dõi</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg card-hover border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-4 text-center">⚡</div>
+                        <h3 class="text-lg font-semibold mb-2 text-center">Hạ tầng & Tiện ích</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm text-center">Mất điện, nước, internet, cột điện nguy hiểm</p>
+                        <div class="mt-4 flex justify-center">
+                            <span class="bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs">Thông tin</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg card-hover border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-4 text-center">👥</div>
+                        <h3 class="text-lg font-semibold mb-2 text-center">An ninh xã hội</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm text-center">Quấy rối, biến thái, đối tượng khả nghi</p>
+                        <div class="mt-4 flex justify-center">
+                            <span class="bg-warning-100 text-warning-700 px-2 py-1 rounded-full text-xs">Cảnh báo</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg card-hover border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-4 text-center">🏗️</div>
+                        <h3 class="text-lg font-semibold mb-2 text-center">Công trình & Xây dựng</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm text-center">Đường xấu, ổ gà, công trình nguy hiểm</p>
+                        <div class="mt-4 flex justify-center">
+                            <span class="bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs">Báo cáo</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg card-hover border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-4 text-center">🛡️</div>
+                        <h3 class="text-lg font-semibold mb-2 text-center">Khu vực an toàn</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm text-center">Nơi được cộng đồng đánh giá an toàn</p>
+                        <div class="mt-4 flex justify-center">
+                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">Tích cực</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI & Technology Section -->
+        <section class="py-20 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Công Nghệ AI Tiên Tiến</h2>
+                    <p class="text-xl text-gray-600 dark:text-gray-300">Hệ thống xác minh thông tin đa tầng với độ chính xác 98.7%</p>
+                </div>
+                
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <div class="space-y-8">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-12 h-12 ai-verified rounded-lg flex items-center justify-center text-white flex-shrink-0">
+                                    <span class="text-xl">🤖</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2">AI Phân tích nội dung</h3>
+                                    <p class="text-gray-600 dark:text-gray-300">Tự động phát hiện tin giả, spam và nội dung không phù hợp bằng thuật toán học máy</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4">
+                                <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+                                    <span class="text-xl">🔍</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2">Xác minh chéo thông tin</h3>
+                                    <p class="text-gray-600 dark:text-gray-300">So sánh với nguồn tin chính thống, báo chí và cơ sở dữ liệu sự kiện</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4">
+                                <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+                                    <span class="text-xl">📊</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2">Phân tích hình ảnh/video</h3>
+                                    <p class="text-gray-600 dark:text-gray-300">Phát hiện ảnh trùng lặp, deepfake và xác định tính xác thực của media</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4">
+                                <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+                                    <span class="text-xl">⚡</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2">Phản hồi thời gian thực</h3>
+                                    <p class="text-gray-600 dark:text-gray-300">Xử lý và phân tích trong vòng 3 giây, cảnh báo tức thì cho cộng đồng</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl">
+                            <div class="text-center mb-6">
+                                <h4 class="text-2xl font-bold mb-2">Quy trình xác minh AI</h4>
+                                <p class="text-gray-600 dark:text-gray-300">Từ báo cáo đến xác nhận</p>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">1</div>
+                                    <span class="text-sm">Nhận báo cáo từ người dùng</span>
+                                </div>
+                                <div class="flex items-center space-x-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                                    <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">2</div>
+                                    <span class="text-sm">AI phân tích nội dung & media</span>
+                                </div>
+                                <div class="flex items-center space-x-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                                    <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white text-sm font-bold">3</div>
+                                    <span class="text-sm">Xác minh chéo với nguồn tin</span>
+                                </div>
+                                <div class="flex items-center space-x-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">4</div>
+                                    <span class="text-sm">Cộng đồng xác nhận & đánh giá</span>
+                                </div>
+                                <div class="flex items-center space-x-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                                    <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white text-sm font-bold">5</div>
+                                    <span class="text-sm">Phát cảnh báo đến người dùng</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 text-center">
+                                <div class="text-3xl font-bold text-green-600">< 3s</div>
+                                <div class="text-sm text-gray-500">Thời gian xử lý trung bình</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-20 gradient-bg">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="text-6xl mb-6">🇻🇳</div>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+                    Tham gia mạng lưới an toàn Việt Nam
+                </h2>
+                <p class="text-xl text-white/90 mb-10">
+                    Hơn 2.8 triệu người dùng đã tin tưởng SafeMap VN. Cùng xây dựng cộng đồng an toàn với công nghệ AI tiên tiến.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="bg-white text-vietnam-red px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2">
+                        <span>🍎</span>
+                        <span>Tải trên iOS</span>
+                    </button>
+                    <button class="bg-white text-vietnam-red px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2">
+                        <span>🤖</span>
+                        <span>Tải trên Android</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Features Page -->
+    <div id="features" class="page">
+        <div class="pt-24 pb-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl font-bold mb-4">🚀 Tính Năng Đột Phá</h1>
+                    <p class="text-xl text-gray-600 dark:text-gray-300">Công nghệ AI và gamification cho cộng đồng an toàn</p>
+                </div>
+
+                <!-- Core Features -->
+                <div class="grid lg:grid-cols-3 gap-8 mb-16">
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-6 text-center">📱</div>
+                        <h3 class="text-2xl font-bold mb-4">Đăng bài đa phương tiện</h3>
+                        <ul class="space-y-3 text-gray-600 dark:text-gray-300">
+                            <li class="flex items-center space-x-2">
+                                <span class="text-green-500">✓</span>
+                                <span>Text, ảnh, video, voice message</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-green-500">✓</span>
+                                <span>GPS định vị chính xác</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-green-500">✓</span>
+                                <span>3 mức độ ưu tiên: 🔴🟠🟢</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-green-500">✓</span>
+                                <span>Chế độ khẩn cấp SOS</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-6 text-center">🤖</div>
+                        <h3 class="text-2xl font-bold mb-4">AI xác minh thông minh</h3>
+                        <ul class="space-y-3 text-gray-600 dark:text-gray-300">
+                            <li class="flex items-center space-x-2">
+                                <span class="text-blue-500">✓</span>
+                                <span>Phát hiện tin giả tự động</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-blue-500">✓</span>
+                                <span>Phân tích ảnh/video deepfake</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-blue-500">✓</span>
+                                <span>Cross-check với báo chí</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-blue-500">✓</span>
+                                <span>Độ tin cậy 98.7%</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <div class="text-4xl mb-6 text-center">🗺️</div>
+                        <h3 class="text-2xl font-bold mb-4">Bản đồ thời gian thực</h3>
+                        <ul class="space-y-3 text-gray-600 dark:text-gray-300">
+                            <li class="flex items-center space-x-2">
+                                <span class="text-red-500">✓</span>
+                                <span>Hiển thị cảnh báo trực tiếp</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-red-500">✓</span>
+                                <span>Lọc theo loại sự kiện</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-red-500">✓</span>
+                                <span>Lịch sử 24h/7 ngày/1 tháng</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-red-500">✓</span>
+                                <span>Cảnh báo lộ trình an toàn</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Advanced Features -->
+                <div class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-3xl p-8 mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-12">Tính Năng Sáng Tạo</h2>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                            <div class="text-3xl mb-4">🎮</div>
+                            <h4 class="font-bold mb-2">Gamification</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">Điểm thưởng, huy hiệu, bảng xếp hạng</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                            <div class="text-3xl mb-4">🛣️</div>
+                            <h4 class="font-bold mb-2">Cảnh báo lộ trình</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">Tránh khu vực nguy hiểm khi di chuyển</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                            <div class="text-3xl mb-4">📊</div>
+                            <h4 class="font-bold mb-2">Phân tích xu hướng</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">Thống kê tội phạm theo khu vực</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                            <div class="text-3xl mb-4">📴</div>
+                            <h4 class="font-bold mb-2">Chế độ offline</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">Lưu trữ và đồng bộ khi có mạng</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Features -->
+                <div class="bg-red-50 dark:bg-red-900/20 rounded-3xl p-8">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-red-700 dark:text-red-400">Hỗ Trợ Khẩn Cấp</h2>
+                    
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                            <div class="text-4xl mb-4">🚨</div>
+                            <h4 class="font-bold mb-2">Nút SOS</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Gửi cảnh báo khẩn cấp tức thì</p>
+                            <button class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm emergency-pulse">
+                                Khẩn cấp
+                            </button>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                            <div class="text-4xl mb-4">📞</div>
+                            <h4 class="font-bold mb-2">Gọi nhanh</h4>
+                            <div class="space-y-2">
+                                <button class="w-full bg-blue-500 text-white py-2 rounded text-sm">113 - Công an</button>
+                                <button class="w-full bg-red-500 text-white py-2 rounded text-sm">114 - Cứu hỏa</button>
+                                <button class="w-full bg-green-500 text-white py-2 rounded text-sm">115 - Cấp cứu</button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                            <div class="text-4xl mb-4">🏛️</div>
+                            <h4 class="font-bold mb-2">Liên kết chính quyền</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">Kết nối trực tiếp với UBND, Công an địa phương</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Community Page -->
+    <div id="community" class="page">
+        <div class="pt-24 pb-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl font-bold mb-4">🏘️ Cộng Đồng SafeMap VN</h1>
+                    <p class="text-xl text-gray-600 dark:text-gray-300">Mạng lưới an toàn với 2.8 triệu thành viên tích cực</p>
+                </div>
+
+                <!-- Community Stats -->
+                <div class="grid md:grid-cols-4 gap-6 mb-12">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                        <div class="text-3xl font-bold text-primary-600 mb-2">2.8M</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Thành viên</div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                        <div class="text-3xl font-bold text-warning-600 mb-2">156K</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Cảnh báo tháng này</div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                        <div class="text-3xl font-bold text-danger-600 mb-2">98.7%</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Độ chính xác</div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                        <div class="text-3xl font-bold text-green-600 mb-2">24/7</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Hoạt động</div>
+                    </div>
+                </div>
+
+                <!-- App Download Prompt -->
+                <div class="bg-gradient-to-r from-vietnam-red/10 to-vietnam-yellow/10 rounded-2xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700 text-center">
+                    <div class="text-4xl mb-4">📱</div>
+                    <h3 class="text-2xl font-semibold mb-4">Tải ứng dụng để tham gia cộng đồng</h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">
+                        Để đăng cảnh báo, xác minh thông tin và nhận thông báo thời gian thực, vui lòng tải ứng dụng SafeMap VN
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button class="bg-vietnam-red hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                            <span>🍎</span>
+                            <span>Tải trên iOS</span>
+                        </button>
+                        <button class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                            <span>🤖</span>
+                            <span>Tải trên Android</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter and Sort -->
+                <div class="flex flex-wrap gap-4 mb-8">
+                    <select id="filterType" class="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        <option value="all">Tất cả sự kiện</option>
+                        <option value="theft">🔓 Trộm cắp</option>
+                        <option value="accident">🚗 Tai nạn</option>
+                        <option value="fire">🔥 Cháy nổ</option>
+                        <option value="flood">🌊 Ngập lụt</option>
+                        <option value="infrastructure">⚡ Hạ tầng</option>
+                        <option value="harassment">👥 Quấy rối</option>
+                        <option value="construction">🏗️ Xây dựng</option>
+                        <option value="safe">🛡️ Khu vực an toàn</option>
+                    </select>
+                    <select id="sortBy" class="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        <option value="newest">Mới nhất</option>
+                        <option value="priority">Độ ưu tiên</option>
+                        <option value="verified">Đã xác minh</option>
+                        <option value="location">Theo địa điểm</option>
+                    </select>
+                    <select id="timeFilter" class="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        <option value="24h">24 giờ qua</option>
+                        <option value="7d">7 ngày qua</option>
+                        <option value="30d">30 ngày qua</option>
+                    </select>
+                </div>
+
+                <!-- Posts Feed -->
+                <div id="postsFeed" class="space-y-6">
+                    <!-- Emergency Alert -->
+                    <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-2xl shadow-lg p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">🚨</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-semibold">Nguyễn Văn A</span>
+                                        <span class="trust-badge px-2 py-1 rounded-full text-xs font-bold">⭐ Tin cậy</span>
+                                        <span class="ai-verified text-white px-2 py-1 rounded-full text-xs font-bold">🤖 AI Verified</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                        <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs">🔴 KHẨN CẤP</span>
+                                        <span>🔓 Cướp giật</span>
+                                        <span>•</span>
+                                        <span>📍 Quận 1, TP.HCM</span>
+                                        <span>•</span>
+                                        <span>15 phút trước</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-red-600">99%</div>
+                                <div class="text-xs text-gray-500">Độ tin cậy</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed font-medium">
+                            ⚠️ CẢNH BÁO KHẨN CẤP: Nhóm 3 người đi xe máy không biển số vừa cướp giật túi xách của chị em trên đường Nguyễn Huệ. 
+                            Đang bỏ chạy hướng Bến Thành. Mọi người cẩn thận!
+                        </p>
+                        <div class="flex items-center justify-between pt-4 border-t border-red-200 dark:border-red-800">
+                            <div class="flex items-center space-x-6">
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>👁️</span>
+                                    <span class="font-medium">1,247 lượt xem</span>
+                                </span>
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>✅</span>
+                                    <span class="font-medium">89 xác nhận</span>
+                                </span>
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>📞</span>
+                                    <span class="font-medium">Đã báo 113</span>
+                                </span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs text-green-600 font-medium bg-green-100 px-2 py-1 rounded">AI Xác minh ✓</span>
+                                <span class="text-xs text-blue-600 font-medium bg-blue-100 px-2 py-1 rounded">Cộng đồng xác nhận ✓</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning Alert -->
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded-2xl shadow-lg p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">🚗</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-semibold">Trần Thị B</span>
+                                        <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-bold">🏆 Top Contributor</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                        <span class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs">🟠 CẢNH BÁO</span>
+                                        <span>🚗 Tai nạn giao thông</span>
+                                        <span>•</span>
+                                        <span>📍 Cầu Giấy, Hà Nội</span>
+                                        <span>•</span>
+                                        <span>2 giờ trước</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-yellow-600">95%</div>
+                                <div class="text-xs text-gray-500">Độ tin cậy</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+                            Tai nạn giao thông tại ngã tư Cầu Giấy - Xuân Thủy, xe tải va chạm xe máy. 
+                            Giao thông ùn tắc kéo dài 2km. Mọi người tránh đường này, đi đường Hoàng Quốc Việt thay thế.
+                        </p>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+                                <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Đường thay thế:</div>
+                                <div class="text-sm text-blue-600">🛣️ Hoàng Quốc Việt → Nguyễn Chí Thanh</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+                                <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Thời gian dự kiến:</div>
+                                <div class="text-sm text-orange-600">⏱️ Kẹt xe thêm 30-45 phút</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-yellow-200 dark:border-yellow-800">
+                            <div class="flex items-center space-x-6">
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>👁️</span>
+                                    <span>567 lượt xem</span>
+                                </span>
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>✅</span>
+                                    <span>34 xác nhận</span>
+                                </span>
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>🚑</span>
+                                    <span>Cấp cứu đã đến</span>
+                                </span>
+                            </div>
+                            <span class="text-xs text-green-600 font-medium bg-green-100 px-2 py-1 rounded">Đã xác minh ✓</span>
+                        </div>
+                    </div>
+
+                    <!-- Info Alert -->
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-2xl shadow-lg p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">⚡</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-semibold">Lê Văn C</span>
+                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-bold">🛡️ Người gác phố</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                        <span class="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">🟢 THÔNG TIN</span>
+                                        <span>⚡ Mất điện</span>
+                                        <span>•</span>
+                                        <span>📍 Quận 7, TP.HCM</span>
+                                        <span>•</span>
+                                        <span>4 giờ trước</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-blue-600">92%</div>
+                                <div class="text-xs text-gray-500">Độ tin cậy</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+                            Khu vực Phú Mỹ Hưng mất điện diện rộng từ 14h. EVN thông báo sẽ khôi phục trong 2-3 giờ tới. 
+                            Các cửa hàng, quán ăn tạm đóng cửa.
+                        </p>
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg mb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-lg">🏢</span>
+                                <span class="font-medium">Cập nhật từ EVN HCMC:</span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">
+                                "Sự cố do sét đánh trạm biến áp. Đang khẩn trương sửa chữa. Dự kiến khôi phục 17h30."
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-blue-200 dark:border-blue-800">
+                            <div class="flex items-center space-x-6">
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>👁️</span>
+                                    <span>234 lượt xem</span>
+                                </span>
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>✅</span>
+                                    <span>12 xác nhận</span>
+                                </span>
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>🔄</span>
+                                    <span>Đang theo dõi</span>
+                                </span>
+                            </div>
+                            <span class="text-xs text-yellow-600 font-medium bg-yellow-100 px-2 py-1 rounded">Chờ cập nhật</span>
+                        </div>
+                    </div>
+
+                    <!-- Safe Zone Alert -->
+                    <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 rounded-2xl shadow-lg p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">🛡️</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-semibold">Phạm Thị D</span>
+                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">🌟 Community Hero</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                        <span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs">🟢 KHU VỰC AN TOÀN</span>
+                                        <span>🛡️ Khu vực được bảo vệ</span>
+                                        <span>•</span>
+                                        <span>📍 Công viên Tao Đàn, Q1</span>
+                                        <span>•</span>
+                                        <span>6 giờ trước</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-green-600">⭐</div>
+                                <div class="text-xs text-gray-500">Khu vực tốt</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+                            Công viên Tao Đàn rất an toàn cho hoạt động thể dục buổi sáng. Có bảo vệ 24/7, camera giám sát đầy đủ, 
+                            ánh sáng tốt. Nhiều người tập thể dục từ 5h-8h sáng.
+                        </p>
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                            <div class="bg-white dark:bg-gray-800 p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">🔒</div>
+                                <div class="text-xs text-gray-600 dark:text-gray-300">Bảo vệ 24/7</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">📹</div>
+                                <div class="text-xs text-gray-600 dark:text-gray-300">Camera đầy đủ</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">💡</div>
+                                <div class="text-xs text-gray-600 dark:text-gray-300">Ánh sáng tốt</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-green-200 dark:border-green-800">
+                            <div class="flex items-center space-x-6">
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>👁️</span>
+                                    <span>89 lượt xem</span>
+                                </span>
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>👍</span>
+                                    <span>67 thích</span>
+                                </span>
+                                <span class="flex items-center space-x-2 text-gray-600">
+                                    <span>⭐</span>
+                                    <span>4.8/5 đánh giá</span>
+                                </span>
+                            </div>
+                            <span class="text-xs text-green-600 font-medium bg-green-100 px-2 py-1 rounded">Khu vực an toàn ✓</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Load More -->
+                <div class="text-center mt-12">
+                    <button class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+                        Xem thêm cảnh báo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Page -->
+    <div id="map" class="page">
+        <div class="pt-24 pb-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl font-bold mb-4">🗺️ Bản Đồ An Toàn Việt Nam</h1>
+                    <p class="text-xl text-gray-600 dark:text-gray-300">Theo dõi tình hình an ninh thời gian thực trên toàn quốc</p>
+                </div>
+
+                <!-- Map Controls -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
+                    <div class="grid md:grid-cols-4 gap-4 mb-6">
+                        <select class="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                            <option>Toàn quốc</option>
+                            <option>Miền Bắc</option>
+                            <option>Miền Trung</option>
+                            <option>Miền Nam</option>
+                        </select>
+                        <select class="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                            <option>Tất cả sự kiện</option>
+                            <option>🔴 Khẩn cấp</option>
+                            <option>🟠 Cảnh báo</option>
+                            <option>🟢 Thông tin</option>
+                        </select>
+                        <select class="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                            <option>24 giờ qua</option>
+                            <option>7 ngày qua</option>
+                            <option>30 ngày qua</option>
+                        </select>
+                        <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg font-medium transition-colors">
+                            🔄 Làm mới
+                        </button>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="flex flex-wrap gap-4 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-red-500 rounded-full"></div>
+                            <span>Khẩn cấp (23)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                            <span>Cảnh báo (67)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
+                            <span>Thông tin (89)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+                            <span>An toàn (156)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Map -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="relative h-96 bg-gradient-to-br from-blue-100 to-green-100 dark:from-gray-700 dark:to-gray-600 rounded-xl overflow-hidden">
+                        <!-- Vietnam Map Visualization -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg viewBox="0 0 400 600" class="w-full h-full max-w-md">
+                                <!-- Vietnam outline -->
+                                <path d="M200 40 L240 80 L260 140 L250 200 L230 260 L220 320 L210 380 L200 440 L190 500 L180 540 L170 520 L160 460 L150 400 L140 340 L130 280 L120 220 L130 160 L150 100 L180 50 Z" 
+                                      fill="none" stroke="currentColor" stroke-width="3" class="text-gray-400"/>
+                                
+                                <!-- Alert points with different priorities -->
+                                <!-- Emergency (Red) -->
+                                <circle cx="180" cy="120" r="6" fill="#ef4444" class="animate-pulse cursor-pointer" onclick="showAlertDetail('hanoi-theft')"/>
+                                <circle cx="220" cy="160" r="6" fill="#ef4444" class="animate-pulse cursor-pointer"/>
+                                <circle cx="190" cy="240" r="6" fill="#ef4444" class="animate-pulse cursor-pointer"/>
+                                
+                                <!-- Warning (Yellow) -->
+                                <circle cx="170" cy="180" r="5" fill="#f59e0b" class="animate-pulse cursor-pointer"/>
+                                <circle cx="200" cy="280" r="5" fill="#f59e0b" class="animate-pulse cursor-pointer"/>
+                                <circle cx="180" cy="360" r="5" fill="#f59e0b" class="animate-pulse cursor-pointer"/>
+                                <circle cx="200" cy="400" r="5" fill="#f59e0b" class="animate-pulse cursor-pointer"/>
+                                
+                                <!-- Info (Blue) -->
+                                <circle cx="160" cy="200" r="4" fill="#3b82f6" class="animate-pulse cursor-pointer"/>
+                                <circle cx="210" cy="320" r="4" fill="#3b82f6" class="animate-pulse cursor-pointer"/>
+                                <circle cx="190" cy="420" r="4" fill="#3b82f6" class="animate-pulse cursor-pointer"/>
+                                
+                                <!-- Safe zones (Green) -->
+                                <circle cx="185" cy="140" r="8" fill="#22c55e" opacity="0.3" class="cursor-pointer"/>
+                                <circle cx="195" cy="300" r="8" fill="#22c55e" opacity="0.3" class="cursor-pointer"/>
+                                <circle cx="180" cy="380" r="8" fill="#22c55e" opacity="0.3" class="cursor-pointer"/>
+                                
+                                <!-- City labels -->
+                                <text x="180" y="110" text-anchor="middle" class="text-xs font-bold fill-current">Hà Nội</text>
+                                <text x="190" y="290" text-anchor="middle" class="text-xs font-bold fill-current">Đà Nẵng</text>
+                                <text x="200" y="430" text-anchor="middle" class="text-xs font-bold fill-current">TP.HCM</text>
+                            </svg>
+                        </div>
+                        
+                        <!-- Alert popup (hidden by default) -->
+                        <div id="alertPopup" class="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 max-w-xs hidden">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <span class="font-bold text-sm">Cảnh báo khẩn cấp</span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Cướp giật tại Quận Ba Đình, Hà Nội</p>
+                            <div class="text-xs text-gray-500">15 phút trước • 89 xác nhận</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Regional Statistics -->
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
+                            <span>🏙️</span>
+                            <span>Miền Bắc</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Hà Nội</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                                    <span class="text-sm font-medium">8 cảnh báo</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Hải Phòng</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                    <span class="text-sm font-medium">3 cảnh báo</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Quảng Ninh</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span class="text-sm font-medium">An toàn</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
+                            <span>🏖️</span>
+                            <span>Miền Trung</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Đà Nẵng</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                    <span class="text-sm font-medium">5 cảnh báo</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Huế</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <span class="text-sm font-medium">2 thông tin</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Nha Trang</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span class="text-sm font-medium">An toàn</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
+                            <span>🌾</span>
+                            <span>Miền Nam</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">TP. Hồ Chí Minh</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                                    <span class="text-sm font-medium">12 cảnh báo</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Cần Thơ</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                    <span class="text-sm font-medium">4 cảnh báo</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Vũng Tàu</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span class="text-sm font-medium">An toàn</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Page -->
+    <div id="about" class="page">
+        <div class="pt-24 pb-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl font-bold mb-4">🏛️ Về SafeMap Việt Nam</h1>
+                    <p class="text-xl text-gray-600 dark:text-gray-300">Công nghệ AI phục vụ cộng đồng an toàn</p>
+                </div>
+
+                <div class="prose prose-lg max-w-none dark:prose-invert">
+                    <div class="bg-gradient-to-r from-vietnam-red/10 to-vietnam-yellow/10 p-8 rounded-2xl mb-8">
+                        <h2 class="text-2xl font-bold mb-4">🎯 Sứ mệnh</h2>
+                        <p class="text-lg">
+                            SafeMap Việt Nam ra đời với sứ mệnh ứng dụng công nghệ AI tiên tiến để xây dựng mạng lưới cảnh báo cộng đồng 
+                            thông minh nhất Việt Nam. Chúng tôi tin rằng, với sự kết hợp giữa trí tuệ nhân tạo và tinh thần "Tương thân tương ái" 
+                            của dân tộc, chúng ta có thể tạo ra một Việt Nam an toàn hơn cho tất cả mọi người.
+                        </p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8 mb-8">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h3 class="text-xl font-bold mb-3 flex items-center space-x-2">
+                                <span>🌟</span>
+                                <span>Tầm nhìn 2030</span>
+                            </h3>
+                            <p>Trở thành nền tảng cảnh báo cộng đồng hàng đầu Đông Nam Á, kết nối 100 triệu người dùng trong mạng lưới an toàn thông minh.</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h3 class="text-xl font-bold mb-3 flex items-center space-x-2">
+                                <span>💎</span>
+                                <span>Giá trị cốt lõi</span>
+                            </h3>
+                            <ul class="space-y-2">
+                                <li>🤖 Công nghệ AI tiên tiến</li>
+                                <li>🤝 Cộng đồng đoàn kết</li>
+                                <li>🔒 Bảo mật tuyệt đối</li>
+                                <li>⚡ Phản hồi tức thì</li>
+                                <li>🎯 Độ chính xác cao</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Technology Stack -->
+                    <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-8 rounded-2xl mb-8">
+                        <h2 class="text-2xl font-bold mb-6 text-center">🚀 Công Nghệ Đột Phá</h2>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="text-center">
+                                <div class="text-4xl mb-3">🤖</div>
+                                <h4 class="font-bold mb-2">Machine Learning</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Thuật toán học sâu phân tích nội dung</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl mb-3">🔍</div>
+                                <h4 class="font-bold mb-2">Computer Vision</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Nhận diện hình ảnh và video</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl mb-3">🗣️</div>
+                                <h4 class="font-bold mb-2">NLP Tiếng Việt</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Xử lý ngôn ngữ tự nhiên</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl mb-3">⚡</div>
+                                <h4 class="font-bold mb-2">Real-time Processing</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Xử lý thời gian thực</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Team -->
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg mb-8">
+                        <h2 class="text-2xl font-bold mb-6 text-center">👥 Đội Ngũ Chuyên Gia</h2>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-2xl text-white">👨‍💻</span>
+                                </div>
+                                <h4 class="font-semibold mb-2">AI Research Team</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">PhD từ Stanford, MIT</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Chuyên gia ML & Computer Vision</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-gradient-to-br from-vietnam-red to-vietnam-yellow rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-2xl text-white">🛡️</span>
+                                </div>
+                                <h4 class="font-semibold mb-2">Security Experts</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Cựu Công an, CSGT</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">15+ năm kinh nghiệm an ninh</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-2xl text-white">🏘️</span>
+                                </div>
+                                <h4 class="font-semibold mb-2">Community Network</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">2,800+ Cộng tác viên</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Mạng lưới 63 tỉnh thành</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Achievements -->
+                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-8 rounded-2xl">
+                        <h2 class="text-2xl font-bold mb-6 text-center">🏆 Thành Tựu Đạt Được</h2>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                            <div>
+                                <div class="text-3xl font-bold text-primary-600 mb-2">2.8M+</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300">Người dùng tin tưởng</div>
+                            </div>
+                            <div>
+                                <div class="text-3xl font-bold text-warning-600 mb-2">98.7%</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300">Độ chính xác AI</div>
+                            </div>
+                            <div>
+                                <div class="text-3xl font-bold text-danger-600 mb-2">< 3s</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300">Thời gian phản hồi</div>
+                            </div>
+                            <div>
+                                <div class="text-3xl font-bold text-green-600 mb-2">24/7</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300">Hoạt động liên tục</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="col-span-2">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold">🛡️</span>
+                        </div>
+                        <div>
+                            <span class="text-xl font-bold">SafeMap Việt Nam</span>
+                            <div class="text-xs text-gray-400">AI-Powered Community Safety</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 mb-6 max-w-md">
+                        Nền tảng cảnh báo cộng đồng thông minh đầu tiên tại Việt Nam. 
+                        Cùng nhau xây dựng một Việt Nam an toàn hơn với công nghệ AI tiên tiến.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <span>📘</span>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <span>📱</span>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <span>📺</span>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <span>🐦</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Sản phẩm</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><button onclick="showPage('features')" class="hover:text-white transition-colors">Tính năng</button></li>
+                        <li><button onclick="showPage('community')" class="hover:text-white transition-colors">Cộng đồng</button></li>
+                        <li><button onclick="showPage('map')" class="hover:text-white transition-colors">Bản đồ</button></li>
+                        <li><a href="#" class="hover:text-white transition-colors">API cho nhà phát triển</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Hỗ trợ</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Trung tâm trợ giúp</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Chính sách bảo mật</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Điều khoản sử dụng</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Liên hệ</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 mb-4 md:mb-0">
+                    &copy; 2024 SafeMap Việt Nam. Tự hào phục vụ cộng đồng Việt Nam 🇻🇳
+                </p>
+                <div class="flex items-center space-x-4 text-sm text-gray-400">
+                    <span>Được hỗ trợ bởi AI</span>
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span>Hoạt động 24/7</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const html = document.documentElement;
+        
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.classList.toggle('dark', currentTheme === 'dark');
+        
+        darkModeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const newTheme = html.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Live stats animation
+        function animateStats() {
+            const stats = [
+                { id: 'activeUsers', target: 2847, current: 2800 },
+                { id: 'todayAlerts', target: 156, current: 150 },
+                { id: 'aiVerified', target: 98.7, current: 98.5, isDecimal: true }
+            ];
+
+            stats.forEach(stat => {
+                const element = document.getElementById(stat.id);
+                if (element) {
+                    const increment = (stat.target - stat.current) / 20;
+                    let current = stat.current;
+                    
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= stat.target) {
+                            current = stat.target;
+                            clearInterval(timer);
+                        }
+                        
+                        if (stat.isDecimal) {
+                            element.textContent = current.toFixed(1) + '%';
+                        } else {
+                            element.textContent = Math.floor(current).toLocaleString();
+                        }
+                    }, 100);
+                }
+            });
+        }
+
+        // Filter functionality
+        document.getElementById('filterType')?.addEventListener('change', function() {
+            const filterValue = this.value;
+            const posts = document.querySelectorAll('#postsFeed > div');
+            
+            posts.forEach(post => {
+                if (filterValue === 'all') {
+                    post.style.display = 'block';
+                } else {
+                    const postType = post.querySelector('.text-sm').textContent;
+                    const shouldShow = postType.includes(getEventIcon(filterValue));
+                    post.style.display = shouldShow ? 'block' : 'none';
+                }
+            });
+        });
+
+        function getEventIcon(type) {
+            const icons = {
+                theft: '🔓',
+                accident: '🚗',
+                fire: '🔥',
+                flood: '🌊',
+                infrastructure: '⚡',
+                harassment: '👥',
+                construction: '🏗️',
+                safe: '🛡️'
+            };
+            return icons[type] || '';
+        }
+
+        // Map interaction
+        function showAlertDetail(alertId) {
+            const popup = document.getElementById('alertPopup');
+            if (popup) {
+                popup.classList.remove('hidden');
+                setTimeout(() => {
+                    popup.classList.add('hidden');
+                }, 3000);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            animateStats();
+            
+            // Intersection Observer for animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.animate-fade-in, .animate-slide-up').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+                observer.observe(el);
+            });
+        });
+
+        // CTA button handlers
+        document.querySelectorAll('button').forEach(button => {
+            if (button.textContent.includes('Tải') && (button.textContent.includes('iOS') || button.textContent.includes('Android'))) {
+                button.addEventListener('click', () => {
+                    alert('SafeMap Việt Nam sẽ sớm có mặt trên App Store và Google Play! 🇻🇳\n\nTính năng nổi bật:\n🤖 AI xác minh 98.7% chính xác\n🗺️ Bản đồ thời gian thực\n🚨 Cảnh báo khẩn cấp SOS\n🏆 Hệ thống gamification');
+                });
+            }
+        });
+
+        // Emergency button handlers
+        document.querySelectorAll('button').forEach(button => {
+            if (button.textContent.includes('113') || button.textContent.includes('114') || button.textContent.includes('115')) {
+                button.addEventListener('click', () => {
+                    alert('Tính năng gọi khẩn cấp chỉ khả dụng trong ứng dụng mobile SafeMap VN');
+                });
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'971b155f65662673',t:'MTc1NTYyMTUyOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
